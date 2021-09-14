@@ -1,4 +1,5 @@
-﻿using FlightPlannerWeb.Storage;
+﻿using FlightPlannerWeb.Models;
+using FlightPlannerWeb.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +18,15 @@ namespace FlightPlannerWeb.Controllers
             var flight = FlightStorage.GetById(id);
             if (flight == null) return NotFound();
             return Ok();
+        }
+
+        [HttpPut]
+        [Route("flights")]
+        public IActionResult PutFlight(Flight flight)
+        {
+            if (FlightStorage.Exists(flight)) return Conflict();
+            if (FlightStorage.IsValid(flight)) return BadRequest();
+            return Created("", flight);
         }
     }
 }
