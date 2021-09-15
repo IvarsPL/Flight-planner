@@ -21,9 +21,7 @@ namespace FlightPlannerWeb.Authentication
             UrlEncoder encoder,
             ISystemClock clock )
             : base(options, logger, encoder, clock)
-        {
-           
-        }
+        {}
         
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -56,7 +54,7 @@ namespace FlightPlannerWeb.Authentication
 
             var claims = new[] {
                 new Claim(ClaimTypes.NameIdentifier, "codelex-admin"),
-                new Claim(ClaimTypes.Name, "codelex-admin"),
+                new Claim(ClaimTypes.Name, "codelex-admin")
             };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);

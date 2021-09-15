@@ -9,6 +9,6 @@ namespace FlightPlannerWeb.Models
     {
         public string Country { get; set; }
         public string City { get; set; }
-        public string AirportCode { get; set; }
+        public string airport { get; set; }
     }
 }

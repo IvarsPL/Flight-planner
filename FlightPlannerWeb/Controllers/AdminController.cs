@@ -12,20 +12,22 @@ namespace FlightPlannerWeb.Controllers
     {
         
         [HttpGet]
-        [Route("flights/ ${id}")]
+        [Route("flights/{id}")]
         public IActionResult GetFlight(int id)
         {
-            var flight = FlightStorage.GetById(id);
-            if (flight == null) return NotFound();
-            return Ok();
+           var flight = FlightStorage.GetById(id);
+           if (flight == null) return NotFound();
+            return Ok(flight);
+            
         }
 
         [HttpPut]
         [Route("flights")]
         public IActionResult PutFlight(Flight flight)
         {
-            if (FlightStorage.Exists(flight)) return Conflict();
-            if (FlightStorage.IsValid(flight)) return BadRequest();
+            //if (!FlightStorage.IsValid(flight)) return BadRequest(); //400
+            if (FlightStorage.Exists(flight)) return Conflict(); //409
+            FlightStorage.AddFlight(flight);
             return Created("", flight);
         }
     }
