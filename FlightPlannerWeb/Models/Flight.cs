@@ -23,17 +23,15 @@ namespace FlightPlannerWeb.Models
                 return false;
             }
 
-            return (
-                this.From.City == item.From.City
-                && this.From.Country == item.From.Country
-                && this.From.airport == item.From.airport
-                && this.To.City == item.To.City
-                && this.To.Country == item.To.Country
-                && this.To.airport == item.To.airport
-                && this.Carrier == item.Carrier
-                && this.ArrivalTime == item.ArrivalTime
-                && this.DepartureTime == item.DepartureTime
-                    );
+            return this.From.City == item.From.City
+                   && this.From.Country == item.From.Country
+                   && this.From.airport == item.From.airport
+                   && this.To.City == item.To.City
+                   && this.To.Country == item.To.Country
+                   && this.To.airport == item.To.airport
+                   && this.Carrier == item.Carrier
+                   && this.ArrivalTime == item.ArrivalTime
+                   && this.DepartureTime == item.DepartureTime;
         }
     }
 }
