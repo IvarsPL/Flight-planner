@@ -34,8 +34,7 @@ namespace FlightPlannerWeb.Controllers
         [Route("flights/{id}")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var flight = FlightStorage.GetById(id);
-            FlightStorage.DeleteFlight(flight);
+            FlightStorage.DeleteFlight(id);
             return Ok();
         }
 
