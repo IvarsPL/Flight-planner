@@ -124,17 +124,19 @@ namespace FlightPlannerWeb.Storage
         {
             lock (_balanceLock)
             {
-                var flight = _flights.Find(f => f.From.airport == fs.From
-                                                && f.To.airport == fs.To
-                                                && f.DepartureTime == fs.DepartureTime);
-                PageResult result = new PageResult();
-                result.Page = 0;
-                result.TotalItems = 0;
+                var flight = _flights.Find(f => f.From.airport == fs.from
+                                                && f.To.airport == fs.to
+                                                && f.DepartureTime.Substring(0,10) == fs.departureDate);
+                PageResult result = new PageResult {Page = 0, TotalItems = 0};
 
                 if (fs != null)
                 {
                     result.Items = new List<Flight>();
-                    if (flight != null) result.Items.Add(flight);
+                    if (flight != null)
+                    {
+                        result.Items.Add(flight);
+                        result.TotalItems++;
+                    }
                 }
                 return result;
             }

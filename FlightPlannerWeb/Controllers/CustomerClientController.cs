@@ -27,7 +27,7 @@ namespace FlightPlannerWeb.Controllers
         [Route("flights/search")]
         public IActionResult SearchFlights(FlightSearch fs)
         {
-            if (fs.From == fs.To) return BadRequest();
+            if (fs.from == fs.to) return BadRequest();
             PageResult flight = FlightStorage.SearchFlight(fs);
             return Ok(flight);
         }
