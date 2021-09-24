@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace FlightPlannerWeb.Authentication
 {
@@ -19,10 +18,10 @@ namespace FlightPlannerWeb.Authentication
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            ISystemClock clock )
+            ISystemClock clock)
             : base(options, logger, encoder, clock)
-        {}
-        
+        { }
+
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var endpoint = Context.GetEndpoint();
@@ -31,7 +30,7 @@ namespace FlightPlannerWeb.Authentication
 
             if (!Request.Headers.ContainsKey("Authorization"))
                 return AuthenticateResult.Fail("Missing Authorization Header");
-           
+
             bool authenticated = false;
 
             try
@@ -41,7 +40,7 @@ namespace FlightPlannerWeb.Authentication
                 var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
                 var username = credentials[0];
                 var password = credentials[1];
-                authenticated = await Authenticate(username,password);
+                authenticated = await Authenticate(username, password);
             }
 
             catch
@@ -73,7 +72,7 @@ namespace FlightPlannerWeb.Authentication
         {
             return username == "codelex-admin" && password == "Password123";
         }
-        
+
 
     }
 }

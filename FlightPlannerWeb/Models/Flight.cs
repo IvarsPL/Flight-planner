@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace FlightPlannerWeb.Models
+﻿namespace FlightPlannerWeb.Models
 {
     public class Flight
     {
@@ -16,8 +11,8 @@ namespace FlightPlannerWeb.Models
 
         public override bool Equals(object flight)
         {
-           var item = (Flight) flight;
-            
+            var item = (Flight)flight;
+
             if (item == null)
             {
                 return false;

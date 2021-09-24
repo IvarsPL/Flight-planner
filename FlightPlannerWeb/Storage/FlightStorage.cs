@@ -1,11 +1,9 @@
-﻿using System;
+﻿using FlightPlannerWeb.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using FlightPlannerWeb.Models;
 
 namespace FlightPlannerWeb.Storage
 {
@@ -13,7 +11,7 @@ namespace FlightPlannerWeb.Storage
     {
         private static readonly List<Flight> _flights = new List<Flight>();
         private static int _flightId = 1;
-        private static object _balanceLock = new ();
+        private static object _balanceLock = new();
 
         public static Flight GetById(int id)
         {
@@ -21,13 +19,13 @@ namespace FlightPlannerWeb.Storage
             {
                 return _flights.SingleOrDefault(f => f.Id == id);
             }
-           
+
         }
 
         public static Airport[] GetAirport(string search)
         {
             var airports = new Airport[1];
-            
+
             search = Regex.Replace(search, @"\s", "").ToLower();
             foreach (var flight in _flights)
             {
@@ -48,7 +46,7 @@ namespace FlightPlannerWeb.Storage
             {
                 _flights.Clear();
             }
-            
+
         }
 
         public static Flight AddFlight(Flight flight)
@@ -60,7 +58,7 @@ namespace FlightPlannerWeb.Storage
                 _flightId++;
                 return flight;
             }
-            
+
 
         }
 
@@ -73,9 +71,9 @@ namespace FlightPlannerWeb.Storage
                 {
                     _flights.Remove(flight);
                 }
-                
+
             }
-            
+
         }
 
         public static bool Exists(Flight flight)
@@ -89,7 +87,7 @@ namespace FlightPlannerWeb.Storage
 
                 return false;
             }
-            
+
         }
 
         public static bool IsValid(Flight flight)
@@ -117,7 +115,7 @@ namespace FlightPlannerWeb.Storage
 
                 return false;
             }
-            
+
         }
 
         public static PageResult SearchFlight(FlightSearch fs)
@@ -126,8 +124,8 @@ namespace FlightPlannerWeb.Storage
             {
                 var flight = _flights.Find(f => f.From.airport == fs.from
                                                 && f.To.airport == fs.to
-                                                && f.DepartureTime.Substring(0,10) == fs.departureDate);
-                PageResult result = new PageResult {Page = 0, TotalItems = 0};
+                                                && f.DepartureTime.Substring(0, 10) == fs.departureDate);
+                PageResult result = new PageResult { Page = 0, TotalItems = 0 };
 
                 if (fs != null)
                 {
@@ -140,7 +138,7 @@ namespace FlightPlannerWeb.Storage
                 }
                 return result;
             }
-           
+
         }
     }
 }
