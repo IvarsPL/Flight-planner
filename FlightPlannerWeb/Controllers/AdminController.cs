@@ -55,6 +55,5 @@ namespace FlightPlannerWeb.Controllers
             FlightStorage.DeleteFlight(id, _context);
             return Ok();
         }
-
     }
 }
