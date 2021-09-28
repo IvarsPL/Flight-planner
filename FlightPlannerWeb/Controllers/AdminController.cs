@@ -4,6 +4,7 @@ using FlightPlannerWeb.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace FlightPlannerWeb.Controllers
 {
@@ -25,9 +26,11 @@ namespace FlightPlannerWeb.Controllers
             var flight = _context.Flights
                 .Include(a => a.To)
                 .Include(a => a.From)
-                .SingleOrDefaultAsync(f => f.Id == id);
-            //FlightStorage.GetById(id);
-            if (flight == null) return NotFound();
+                .SingleOrDefault(f => f.Id == id);
+
+            if (flight == null)
+                return NotFound();
+
             return Ok(flight);
         }
 
@@ -35,11 +38,13 @@ namespace FlightPlannerWeb.Controllers
         [Route("flights")]
         public IActionResult PutFlight(Flight flight)
         {
-            if (!FlightStorage.IsValid(flight)) return BadRequest(); //400
-            if (FlightStorage.Exists(flight)) return Conflict(); //409
+            if (!FlightStorage.IsValid(flight))
+                return BadRequest(); //400
+            if (FlightStorage.Exists(flight, _context))
+                return Conflict(); //409
             _context.Flights.Add(flight);
             _context.SaveChanges();
-            //FlightStorage.AddFlight(flight);
+
             return Created("", flight);
         }
 
@@ -47,7 +52,7 @@ namespace FlightPlannerWeb.Controllers
         [Route("flights/{id}")]
         public IActionResult DeleteConfirmed(int id)
         {
-            FlightStorage.DeleteFlight(id);
+            FlightStorage.DeleteFlight(id, _context);
             return Ok();
         }
 

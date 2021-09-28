@@ -1,6 +1,7 @@
-﻿using FlightPlannerWeb.Models;
+﻿using FlightPlannerWeb.DbContext;
+using FlightPlannerWeb.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -9,85 +10,54 @@ namespace FlightPlannerWeb.Storage
 {
     public static class FlightStorage
     {
-        private static readonly List<Flight> _flights = new List<Flight>();
-        private static int _flightId = 1;
         private static object _balanceLock = new();
-
-        public static Flight GetById(int id)
+        public static Flight FindFlight(int id, FlightPlannerDbContext context)
         {
-            lock (_balanceLock)
-            {
-                return _flights.SingleOrDefault(f => f.Id == id);
-            }
-
+            return context.Flights
+                .Include(a => a.To)
+                .Include(a => a.From)
+                .SingleOrDefault(f => f.Id == id);
+        }
+        
+        public static Flight GetById(int id, FlightPlannerDbContext context)
+        {
+            return FindFlight(id, context);
         }
 
-        public static Airport[] GetAirport(string search)
+        public static Airport[] GetAirport(string search, FlightPlannerDbContext context)
         {
             var airports = new Airport[1];
 
             search = Regex.Replace(search, @"\s", "").ToLower();
-            foreach (var flight in _flights)
+            foreach (var flight in context.Airports)
             {
-                if (flight.From.City.ToLower().Contains(search)) airports[0] = flight.From;
-                if (flight.From.Country.ToLower().Contains(search)) airports[0] = flight.From;
-                if (flight.From.airport.ToLower().Contains(search)) airports[0] = flight.From;
-                if (flight.To.City.ToLower().Contains(search)) airports[0] = flight.To;
-                if (flight.To.Country.ToLower().Contains(search)) airports[0] = flight.To;
-                if (flight.To.airport.ToLower().Contains(search)) airports[0] = flight.To;
+                if (flight.City.ToLower().Contains(search)) airports[0] = flight;
+                if (flight.Country.ToLower().Contains(search)) airports[0] = flight;
+                if (flight.airport.ToLower().Contains(search)) airports[0] = flight;
+                if (flight.City.ToLower().Contains(search)) airports[0] = flight;
+                if (flight.Country.ToLower().Contains(search)) airports[0] = flight;
+                if (flight.airport.ToLower().Contains(search)) airports[0] = flight;
             }
 
             return airports;
         }
 
-        public static void ClearFlights()
+        public static bool Exists(Flight flight, FlightPlannerDbContext context)
         {
-            lock (_balanceLock)
-            {
-                _flights.Clear();
-            }
+            Flight result = context.Flights
+                .Include(a => a.To)
+                .Include(a => a.From)
+                .FirstOrDefault(f => f.ArrivalTime == flight.ArrivalTime
+                                     && f.Carrier == flight.Carrier
+                                     && f.DepartureTime == flight.DepartureTime
+                                     && f.From.airport == flight.From.airport
+                                     && f.From.City == flight.From.City
+                                     && f.From.Country == flight.From.Country
+                                     && f.To.airport == flight.To.airport
+                                     && f.To.City == flight.To.City
+                                     && f.To.Country == flight.To.Country);
 
-        }
-
-        public static Flight AddFlight(Flight flight)
-        {
-            lock (_balanceLock)
-            {
-                flight.Id = _flightId;
-                _flights.Add(flight);
-                _flightId++;
-                return flight;
-            }
-
-
-        }
-
-        public static void DeleteFlight(int id)
-        {
-            lock (_balanceLock)
-            {
-                var flight = _flights.SingleOrDefault(f => f.Id == id);
-                if (flight != null)
-                {
-                    _flights.Remove(flight);
-                }
-
-            }
-
-        }
-
-        public static bool Exists(Flight flight)
-        {
-            lock (_balanceLock)
-            {
-                foreach (var f in _flights)
-                {
-                    if (f.Equals(flight)) return true;
-                }
-
-                return false;
-            }
-
+            return result != null;
         }
 
         public static bool IsValid(Flight flight)
@@ -118,27 +88,38 @@ namespace FlightPlannerWeb.Storage
 
         }
 
-        public static PageResult SearchFlight(FlightSearch fs)
+        public static PageResult SearchFlight(FlightSearch fs, FlightPlannerDbContext context)
         {
             lock (_balanceLock)
             {
-                var flight = _flights.Find(f => f.From.airport == fs.from
-                                                && f.To.airport == fs.to
-                                                && f.DepartureTime.Substring(0, 10) == fs.departureDate);
-                PageResult result = new PageResult { Page = 0, TotalItems = 0 };
+                Flight[] searchedFlights = context.Flights
+                    .Include(a => a.To)
+                    .Include(a => a.From)
+                    .Where(fl =>
+                        fl.From.airport.ToUpper() == fs.from.Trim().ToUpper()
+                        && fl.To.airport.ToUpper() == fs.to.Trim().ToUpper()
+                        && fl.DepartureTime.Substring(0, 10) == fs.departureDate).ToArray();
 
-                if (fs != null)
-                {
-                    result.Items = new List<Flight>();
-                    if (flight != null)
-                    {
-                        result.Items.Add(flight);
-                        result.TotalItems++;
-                    }
-                }
+                PageResult result = new PageResult(searchedFlights);
+
                 return result;
             }
+        }
 
+        public static void DeleteFlight(int id, FlightPlannerDbContext context)
+        {
+            Flight flight = FindFlight(id, context);
+
+            lock (_balanceLock)
+            {
+                if (flight != null)
+                {
+                    context.Airports.Remove(flight.To);
+                    context.Airports.Remove(flight.From);
+                    context.Flights.Remove(flight);
+                    context.SaveChanges();
+                }
+            }
         }
     }
 }

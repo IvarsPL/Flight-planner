@@ -14,7 +14,7 @@ namespace FlightPlannerWeb.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    airport = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AirportCode = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

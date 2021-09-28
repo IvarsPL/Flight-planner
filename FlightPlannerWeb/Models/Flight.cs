@@ -9,24 +9,5 @@
         public string DepartureTime { get; set; }
         public string ArrivalTime { get; set; }
 
-        public override bool Equals(object flight)
-        {
-            var item = (Flight)flight;
-
-            if (item == null)
-            {
-                return false;
-            }
-
-            return this.From.City == item.From.City
-                   && this.From.Country == item.From.Country
-                   && this.From.airport == item.From.airport
-                   && this.To.City == item.To.City
-                   && this.To.Country == item.To.Country
-                   && this.To.airport == item.To.airport
-                   && this.Carrier == item.Carrier
-                   && this.ArrivalTime == item.ArrivalTime
-                   && this.DepartureTime == item.DepartureTime;
-        }
     }
 }
