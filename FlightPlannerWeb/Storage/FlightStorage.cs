@@ -18,7 +18,7 @@ namespace FlightPlannerWeb.Storage
                 .Include(a => a.From)
                 .SingleOrDefault(f => f.Id == id);
         }
-        
+
         public static Flight GetById(int id, FlightPlannerDbContext context)
         {
             return FindFlight(id, context);
@@ -82,7 +82,6 @@ namespace FlightPlannerWeb.Storage
                 {
                     return true;
                 }
-
                 return false;
             }
 
